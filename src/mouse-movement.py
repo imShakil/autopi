@@ -17,7 +17,7 @@ running = False
 def on_start():
     global running
     running = True
-    print('Be Ready, The program started soon')
+    print('Be Ready, The program will be started soon')
     app.after(1000, auto_py)
 
 
@@ -30,11 +30,11 @@ def on_stop():
 def on_destroy():
     app.destroy()
 
-
+# chrome tab
 def switch_tab():
     pyg.hotkey('ctrl', 'tab')
 
-
+# chrome window tab refresh
 def refresh_window():
     pyg.hotkey('f5')
 
@@ -43,7 +43,8 @@ def move_mouse(s_time):
     px, py = pyg.position()
     if time.time() - s_time >= 40:
         return
-
+    # 1920 x 1080 was my monitor resolution, 
+    # Please change this value according to your own.
     px = (px + random.randint(0, 1920)) % 1920
     py = (py + random.randint(0, 1080)) % 1080
     pyg.moveTo(px, py, 1)
