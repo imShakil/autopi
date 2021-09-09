@@ -1,40 +1,75 @@
 #!/usr/bin/python3
 
-import time
 import random
-import pyautogui as pyg
+import subprocess
+import sys
+import time
+
+if sys.version_info.major < 3:
+    print("This script runs under python3")
+    sys.exit()
+
+missing_packages = ['scrot', 'python3-tk', 'python3-dev']
+
+
+def packages():
+    try:
+        for package in missing_packages:
+            subprocess.check_call(['apt-get', 'install', '-y', package])
+    except IOError:
+        print(IOError)
+        sys.exit()
+
+
+try:
+    from tkinter import *
+    from tkinter import ttk
+    import pyautogui
+except ImportError as e:
+    packages()
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyautogui'])
+
 from tkinter import *
 from tkinter import ttk
+import pyautogui as pyg
 
 app = Tk()
-app.geometry("750x300")
-app.minsize(750, 300)
+app.geometry("400x300")
+app.minsize(400, 300)
 app.title('Play Auto Movement Game')
-
+text_box = Text(app, height=30, width=300)
 running = False
+
+
+def popup(msg):
+    text_box.pack()
+    text_box.delete("1.0", "end")
+    text_box.insert('end', msg)
+    text_box.update()
+    time.sleep(1)
 
 
 def on_start():
     global running
     running = True
-    print('Be Ready, The program will be started soon')
+    popup("Program will be started soon.")
     app.after(1000, auto_py)
 
 
 def on_stop():
     global running
     running = False
-    print("Program stopped.")
+    popup("Program has stopped.\nPress [START] to run again.")
 
 
 def on_destroy():
     app.destroy()
 
-# chrome tab
+
 def switch_tab():
     pyg.hotkey('ctrl', 'tab')
 
-# chrome window tab refresh
+
 def refresh_window():
     pyg.hotkey('f5')
 
@@ -43,8 +78,7 @@ def move_mouse(s_time):
     px, py = pyg.position()
     if time.time() - s_time >= 40:
         return
-    # 1920 x 1080 was my monitor resolution, 
-    # Please change this value according to your own.
+
     px = (px + random.randint(0, 1920)) % 1920
     py = (py + random.randint(0, 1080)) % 1080
     pyg.moveTo(px, py, 1)
@@ -53,12 +87,7 @@ def move_mouse(s_time):
 
 def auto_py():
     if running:
-        for _ in range(3):
-            for i in range(3):
-                sys.stdout.write('\rLoading{}'.format('.' * (i + 1)))
-                sys.stdout.flush()
-                time.sleep(1)
-        print('\nProgram started.')
+        popup("Program has started.")
         time.sleep(3)
         switch_tab()
         time.sleep(3)
@@ -69,9 +98,8 @@ def auto_py():
         pyg.scroll(-10)
         time.sleep(3)
         move_mouse(time.time())
-        print('Looping...')
-        time.sleep(10)
-        app.after(1000, auto_py)
+        popup('Looping...\nProgram will run again after 15 seconds.\nPress [STOP] to stop the program.')
+        app.after(15000, auto_py)
 
 
 start = ttk.Button(app, text="start", command=on_start)
