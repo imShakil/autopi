@@ -67,16 +67,18 @@ def on_destroy():
 
 
 def switch_tab():
+    pyg.sleep(5)
     pyg.hotkey('ctrl', 'tab')
 
 
 def refresh_window():
+    pyg.sleep(5)
     pyg.hotkey('f5')
 
 
 def move_mouse(s_time):
     px, py = pyg.position()
-    if time.time() - s_time >= 40:
+    if time.time() - s_time >= 20:
         return
 
     px = (px + random.randint(0, 1920)) % 1920
@@ -87,19 +89,14 @@ def move_mouse(s_time):
 
 def auto_py():
     if running:
-        popup("Program has started.")
-        time.sleep(3)
+        popup("Program is running.")
         switch_tab()
-        time.sleep(3)
         refresh_window()
-        time.sleep(3)
-        pyg.scroll(10)
-        time.sleep(3)
-        pyg.scroll(-10)
-        time.sleep(3)
+        pyg.scroll(5000, 10)
+        pyg.scroll(5000, -10)
         move_mouse(time.time())
-        popup('Looping...\nProgram will run again after 15 seconds.\nPress [STOP] to stop the program.')
-        app.after(15000, auto_py)
+        popup('Looping...\nProgram will run again after 30 seconds.\nPress [STOP] to stop the program.')
+        app.after(30000, auto_py)
 
 
 start = ttk.Button(app, text="start", command=on_start)
@@ -111,6 +108,6 @@ stop.pack(padx=30, pady=10)
 destroy = ttk.Button(app, text="Exit", command=on_destroy)
 destroy.pack(padx=50, pady=10)
 
-# Run a function to print text in window
+
 app.after(1000, auto_py)
 app.mainloop()
