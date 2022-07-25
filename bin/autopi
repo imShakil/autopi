@@ -36,7 +36,7 @@ import pyautogui as pyg
 app = Tk()
 app.geometry("400x300")
 app.minsize(400, 300)
-app.title('Play Auto Movement Game')
+app.title('Python Stalker')
 text_box = Text(app, height=30, width=300)
 running = False
 
@@ -53,7 +53,8 @@ def on_start():
     global running
     running = True
     popup("Program will be started soon.")
-    app.after(1000, auto_py)
+    popup("Program is running...")
+    app.after(5000, auto_py)
 
 
 def on_stop():
@@ -67,36 +68,46 @@ def on_destroy():
 
 
 def switch_tab():
-    pyg.sleep(5)
+    popup("Swtiching tabs...")
+    pyg.sleep(3)
     pyg.hotkey('ctrl', 'tab')
 
 
 def refresh_window():
-    pyg.sleep(5)
+    popup("Refreshing Window...")
+    pyg.sleep(3)
     pyg.hotkey('f5')
 
 
-def move_mouse(s_time):
-    px, py = pyg.position()
-    if time.time() - s_time >= 20:
-        return
+def page_scroll():
+    popup("Scrolling Pages...")
+    pyg.sleep(3)
+    pyg.scroll(600, 700, 10)
+    pyg.scroll(600, 700, -10)
 
-    px = (px + random.randint(0, 1920)) % 1920
-    py = (py + random.randint(0, 1080)) % 1080
+
+def move_mouse(s_time, r_time):
+    px, py = pyg.position()
+    if time.time() - s_time >= r_time:
+        return
+    popup("Mouse position: (" + str(px) + ", " + str(py) + ")")
+    px = 250 + (px + random.randint(0, 1600)) % 1600
+    py = 150 + (py + random.randint(0, 800)) % 800
+    popup("Mouse moving to: (" + str(px) + ", " + str(py) + ")")
     pyg.moveTo(px, py, 1)
-    move_mouse(s_time)
+    move_mouse(s_time, r_time)
 
 
 def auto_py():
     if running:
-        popup("Program is running.")
         switch_tab()
         refresh_window()
-        pyg.scroll(5000, 10)
-        pyg.scroll(5000, -10)
-        move_mouse(time.time())
-        popup('Looping...\nProgram will run again after 30 seconds.\nPress [STOP] to stop the program.')
-        app.after(30000, auto_py)
+        r_time = random.randint(5, 30)
+        popup("Moving mouse for " + str(r_time) + " seconds")
+        move_mouse(time.time(), r_time)
+        r_time = random.randint(20, 50)
+        popup('Looping...\nProgram will run again after ' + str(r_time) +' seconds.\nPress [STOP] to stop the program.')
+        app.after(r_time*1000, auto_py)
 
 
 start = ttk.Button(app, text="start", command=on_start)

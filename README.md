@@ -16,7 +16,7 @@ I already added all pre-requirements inside the python script. During running th
 So, First of all lets clone this repository:
 
 ```
-git clone https://github.com/imShakil/mousemovement.git /opt/mousemovement
+git clone https://github.com/imShakil/autopi.git /opt/autopi
 ```
 
 Now, let's move as super user:
@@ -30,19 +30,19 @@ It will ask the `root` user password.
 Let's move into the directory.
 
 ```
-cd /opt/mousemovement/bin
+cd /opt/autopi/bin
 ```
 
 Now give permission to the binary file.
 
 ```
-chmod +x mouse-movement
+chmod +x autopi
 ```
 
 Finally, run the application with following command:
 
 ```
-./mouse-movement
+./autopi
 ```
 
 It will check and install the requirement processes.
@@ -61,10 +61,10 @@ To run this application from dash menu, Create a desktop entry `mouse-movement.d
 ```
 [Desktop Entry]
 Version=1.0
-Name=Mouse Movement
-Comment=Python Auto Mouse Movement
-Exec=/opt/mousemovement/bin/mouse-movement
-Icon=/opt/mousemovement/bin/icon.png
+Name=Auto Pi
+Comment=AutoPi
+Exec=/opt/autopi/bin/autopi
+Icon=/opt/autopi/bin/icon.png
 Terminal=false
 Type=Application
 Categories=Utility;Application;
