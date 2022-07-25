@@ -1,7 +1,5 @@
-# mousemovement
-A python project based on tkinter module to manipulate auto mouse movement.
-In case you need to keep up window active, you can use this application.
-It will move mouse and press keyboard button to make window active.
+# AutoPI
+[AutoPI](https://github.com/imshakil/autopi) is a python project, based on tkinter module to manipulate auto mouse movement and switching between tabs on your chrome browser. In case you need to keep up window active, you can use this application. It will move mouse and press keyboard shortcut to make window active and switching tabs.
 
 # Pre-requirements
 - `Pyautogui`
@@ -76,3 +74,18 @@ Put this desktop entry inside:
 ```
 /usr/local/share/applications/
 ```
+
+# Usage
+
+Before clicking on the [Start](#) button you need to open your chrome browser and open some tabs. After then start **AutoPI** and place your mouse on chrome browser. That's it. You can leave, autopi will keep up activated your activity. 
+
+# Customizing
+
+Its still a basic program for a quick activity tracking system. You can customize it. You need to know some basic functionalites. I will keep it updated  next with good features. 
+
+# Support
+
+If you would like to treat me some coffee, please,  buy me some coffee [here](https://www.buymeacoffee.com/imshakil) 
+Thanks!
+
+~ Shakil
