@@ -129,12 +129,17 @@ def click_mouse():
     if not mouse_click:
         return
     popup('Mouse clicked')
-    pyg.click(button='right', clicks=2, interval=.1)
+    try:
+        btn = config.get('MouseClick', 'button')
+        clicks = config.getint('MouseClick', 'clicks')
+        interval = config.getfloat('MouseClick', 'interval')
+    except ValueError:
+        btn, clicks, interval = 'right', 2, .1
+    pyg.click(button=btn, clicks=clicks, interval=interval)
     time.sleep(1)
 
 
 def auto_py():
-    st = time.time()
     try:
         active_time = min(config.getint('DEFAULT', 'ActiveTime'), 50)
     except ValueError:

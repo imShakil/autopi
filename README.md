@@ -50,7 +50,7 @@ It will check and install the requirement processes.
 This is a pretty simple application with 3 buttons only to `start`, `stop` and `exit` the application.
 It looks like:
 
-![overview.png](/bin/overview.png)
+![overview.png](./bin/overview.png)
 
 # Create Desktop Entry
 
@@ -77,7 +77,33 @@ Put this desktop entry inside:
 
 # Usage
 
-Before clicking on the [Start](#) button you need to open your chrome browser and open some tabs. After then start **AutoPI** and place your mouse on chrome browser. That's it. You can leave, autopi will keep up activated your activity. 
+By default it will just try click your mouse and will switch tabs if they are open. You may customize the [config.ini](config.ini) as your own.
+
+```editorconfig
+[DEFAULT]
+ActiveTime =
+
+[MouseMovement]
+allow = false
+mmTime =
+
+[MouseClick]
+allow = true
+button = 'right'
+clicks = 2
+intervals =
+
+[SwitchingTabs]
+allow = true
+
+[RefreshWindow]
+allow = false
+
+[PageScroll]
+allow = false
+ScrollUp =
+ScrollDown =
+```
 
 # Customizing
 
