@@ -46,7 +46,6 @@ def popup(msg):
     text_box.delete("1.0", "end")
     text_box.insert('end', msg)
     text_box.update()
-    time.sleep(1)
 
 
 def on_start():
@@ -54,7 +53,7 @@ def on_start():
     running = True
     popup("Program will be started soon.")
     popup("Program is running...")
-    app.after(5000, auto_py)
+    app.after(3000, auto_py)
 
 
 def on_stop():
@@ -69,45 +68,61 @@ def on_destroy():
 
 def switch_tab():
     popup("Swtiching tabs...")
-    pyg.sleep(3)
+    time.sleep(3)
     pyg.hotkey('ctrl', 'tab')
 
 
 def refresh_window():
     popup("Refreshing Window...")
-    pyg.sleep(3)
+    time.sleep(3)
     pyg.hotkey('f5')
 
 
 def page_scroll():
     popup("Scrolling Pages...")
-    pyg.sleep(3)
+    time.sleep(3)
     pyg.scroll(600, 700, 10)
     pyg.scroll(600, 700, -10)
 
 
 def move_mouse(s_time, r_time):
+    for i in range(0, r_time):
+        px, py = pyg.position()
+        popup("Mouse position: (" + str(px) + ", " + str(py) + ")")
+        px = 250 + (px + random.randint(0, 1600)) % 1600
+        py = 150 + (py + random.randint(0, 800)) % 800
+        popup("Mouse moving to: (" + str(px) + ", " + str(py) + ")")
+        pyg.moveTo(px, py, 1)
+
+
+def click_mouse():
+    popup('Mouse clicked')
     px, py = pyg.position()
-    if time.time() - s_time >= r_time:
-        return
-    popup("Mouse position: (" + str(px) + ", " + str(py) + ")")
-    px = 250 + (px + random.randint(0, 1600)) % 1600
-    py = 150 + (py + random.randint(0, 800)) % 800
-    popup("Mouse moving to: (" + str(px) + ", " + str(py) + ")")
-    pyg.moveTo(px, py, 1)
-    move_mouse(s_time, r_time)
+    pyg.click(button='right')
 
 
 def auto_py():
     if running:
+        st = time.time()
         switch_tab()
         refresh_window()
-        r_time = random.randint(5, 30)
+        click_mouse()
+        r_time = random.randint(20, 30)
         popup("Moving mouse for " + str(r_time) + " seconds")
         move_mouse(time.time(), r_time)
-        r_time = random.randint(20, 50)
-        popup('Looping...\nProgram will run again after ' + str(r_time) +' seconds.\nPress [STOP] to stop the program.')
-        app.after(r_time*1000, auto_py)
+        s_time = random.randint(10, 30)
+        popup('Looping...\nProgram will run again after ' + str(s_time) +' seconds.\nPress [STOP] to stop the program.')
+        pr = r_time + 1
+        tt = time.time() - st
+        tt = tt + s_time
+        pr = (pr * 100) // tt  
+        for i in range(0, s_time-1):
+            popup('Activity Percentage: ' + str(pr) + "% \nProgram will be running back within " + str(s_time - i) + " seconds...")
+            time.sleep(1)
+            if not running:
+                break
+
+        app.after(1000, auto_py)
 
 
 start = ttk.Button(app, text="start", command=on_start)
