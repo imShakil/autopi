@@ -49,20 +49,11 @@ running = False
 config = configparser.ConfigParser()
 config.read('../config.ini')
 
-# Mouse Movement
-mouse_movement = config['MouseMovement']['allow']
-
-# Page Scroll
-page_scroll = config['PageScroll']['allow']
-
-# Mouse Click
-mouse_click = config['MouseClick']['allow']
-
-# Tab Switching
-switching = config['SwitchingTabs']['allow']
-
-# Reloading Tab
-reload_window = config['RefreshWindow']['allow']
+mouse_movement = config.getboolean('MouseMovement', 'allow')
+page_scroll = config.getboolean('PageScroll', 'allow')
+mouse_click = config.getboolean('MouseClick', 'allow')
+switching = config.getboolean('SwitchingTabs', 'allow')
+reload_window = config.getboolean('RefreshWindow', 'allow')
 
 
 def popup(msg):
@@ -103,28 +94,34 @@ def refresh_window():
         return
     popup("Refreshing Window...")
     time.sleep(1)
-    pyg.hotkey('f5')
+    pyg.hotkey('ctrl', 'R')
 
 
 def scroll_page():
     if not page_scroll:
         return
-    popup("Scrolling Pages...")
+    try:
+        scroll_up = config.getint('PageScroll', 'ScrollUp')
+        scroll_down = config.getint('PageScroll', 'ScrollDown')
+    except ValueError:
+        scroll_up, scroll_down = 15, -15
+    popup("Scrolling Pages for " + str(scroll_up - scroll_down) + " clicks...")
     time.sleep(1)
-    pyg.scroll(600, 700, 10)
-    pyg.scroll(600, 700, -10)
+    pyg.scroll(scroll_up)
+    pyg.scroll(scroll_down)
 
 
 def move_mouse(mm_time):
     if not mouse_movement:
         return
-    popup("Moving mouse for " + str(mm_time) + " seconds")
+    mxs, mys = pyg.size()
     for i in range(0, mm_time):
-        px, py = pyg.position()
-        popup("Mouse position: (" + str(px) + ", " + str(py) + ")")
-        px = 250 + (px + random.randint(0, 1600)) % 1600
-        py = 150 + (py + random.randint(0, 800)) % 800
-        popup("Mouse moving to: (" + str(px) + ", " + str(py) + ")")
+        cpx, cpy = pyg.position()
+        px = (cpx + random.randint(0, mxs)) % mxs
+        py = (cpy + random.randint(0, mys)) % mys
+        popup("Moving mouse for " + str(mm_time - i) + " seconds" +
+              "\nMouse position: (" + str(cpx) + ", " + str(cpy) + ")" +
+              "\nMouse moving to: (" + str(px) + ", " + str(py) + ")")
         pyg.moveTo(px, py, 1)
 
 
@@ -132,14 +129,24 @@ def click_mouse():
     if not mouse_click:
         return
     popup('Mouse clicked')
-    pyg.click(button='right')
+    pyg.click(button='right', clicks=2, interval=.1)
+    time.sleep(1)
 
 
 def auto_py():
     st = time.time()
-    active_time = config['DEFAULT']['ActiveTIme'] if config['DEFAULT']['ActiveTIme'] else random.randint(20, 40)
-    m_time = config['MouseMovement']['mmTime'] if config['MouseMovement']['mmTime'] else random.randint(20, active_time)
-    s_time = config['DEFAULT']['SleepTime'] if config['DEFAULT']['SleepTime'] else random.randint(10, 60 - active_time)
+    try:
+        active_time = min(config.getint('DEFAULT', 'ActiveTime'), 50)
+    except ValueError:
+        active_time = random.randint(30, 40)
+
+    try:
+        m_time = min(config.getint('MouseMovement', 'mmTime'), active_time - 10)
+    except ValueError:
+        m_time = random.randint(20, 30)
+
+    s_time = 60 - active_time
+
     if running:
         switch_tab()
         refresh_window()
@@ -148,10 +155,7 @@ def auto_py():
         move_mouse(m_time)
         popup(
             'Looping...\nProgram will run again after ' + str(s_time) + ' seconds.\nPress [STOP] to stop the program.')
-        pr = m_time + 1
-        tt = time.time() - st
-        tt = tt + s_time
-        pr = (pr * 100) // tt
+        pr = (active_time * 100) // 60
         for i in range(0, s_time - 1):
             popup('Activity Percentage: ' + str(pr) + "% \nProgram will be running back within " + str(
                 s_time - i) + " seconds...")
