@@ -85,7 +85,7 @@ Its still a basic program for a quick activity tracking system. You can customiz
 
 # Support
 
-If you would like to treat me some coffee, please,  buy me some coffee [here](https://www.buymeacoffee.com/imshakil) 
+If you found this helpful, please treat me some coffee [here](https://www.buymeacoffee.com/imshakil) 
 Thanks!
 
 ~ Shakil
