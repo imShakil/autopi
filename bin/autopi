@@ -1,9 +1,14 @@
 #!/usr/bin/python3
 
-import random
-import subprocess
+"""
+@author: github@imshakil
+"""
+
 import sys
 import time
+import random
+import subprocess
+import configparser
 
 if sys.version_info.major < 3:
     print("This script runs under python3")
@@ -40,6 +45,25 @@ app.title('Python Stalker')
 text_box = Text(app, height=30, width=300)
 running = False
 
+# Config Parse
+config = configparser.ConfigParser()
+config.read('../config.ini')
+
+# Mouse Movement
+mouse_movement = config['MouseMovement']['allow']
+
+# Page Scroll
+page_scroll = config['PageScroll']['allow']
+
+# Mouse Click
+mouse_click = config['MouseClick']['allow']
+
+# Tab Switching
+switching = config['SwitchingTabs']['allow']
+
+# Reloading Tab
+reload_window = config['RefreshWindow']['allow']
+
 
 def popup(msg):
     text_box.pack()
@@ -67,26 +91,35 @@ def on_destroy():
 
 
 def switch_tab():
-    popup("Swtiching tabs...")
-    time.sleep(3)
+    if not switching:
+        return
+    popup("Switching tabs...")
+    time.sleep(1)
     pyg.hotkey('ctrl', 'tab')
 
 
 def refresh_window():
+    if not reload_window:
+        return
     popup("Refreshing Window...")
-    time.sleep(3)
+    time.sleep(1)
     pyg.hotkey('f5')
 
 
-def page_scroll():
+def scroll_page():
+    if not page_scroll:
+        return
     popup("Scrolling Pages...")
-    time.sleep(3)
+    time.sleep(1)
     pyg.scroll(600, 700, 10)
     pyg.scroll(600, 700, -10)
 
 
-def move_mouse(s_time, r_time):
-    for i in range(0, r_time):
+def move_mouse(mm_time):
+    if not mouse_movement:
+        return
+    popup("Moving mouse for " + str(mm_time) + " seconds")
+    for i in range(0, mm_time):
         px, py = pyg.position()
         popup("Mouse position: (" + str(px) + ", " + str(py) + ")")
         px = 250 + (px + random.randint(0, 1600)) % 1600
@@ -96,28 +129,32 @@ def move_mouse(s_time, r_time):
 
 
 def click_mouse():
+    if not mouse_click:
+        return
     popup('Mouse clicked')
-    px, py = pyg.position()
     pyg.click(button='right')
 
 
 def auto_py():
+    st = time.time()
+    active_time = config['DEFAULT']['ActiveTIme'] if config['DEFAULT']['ActiveTIme'] else random.randint(20, 40)
+    m_time = config['MouseMovement']['mmTime'] if config['MouseMovement']['mmTime'] else random.randint(20, active_time)
+    s_time = config['DEFAULT']['SleepTime'] if config['DEFAULT']['SleepTime'] else random.randint(10, 60 - active_time)
     if running:
-        st = time.time()
         switch_tab()
         refresh_window()
+        scroll_page()
         click_mouse()
-        r_time = random.randint(20, 30)
-        popup("Moving mouse for " + str(r_time) + " seconds")
-        move_mouse(time.time(), r_time)
-        s_time = random.randint(10, 30)
-        popup('Looping...\nProgram will run again after ' + str(s_time) +' seconds.\nPress [STOP] to stop the program.')
-        pr = r_time + 1
+        move_mouse(m_time)
+        popup(
+            'Looping...\nProgram will run again after ' + str(s_time) + ' seconds.\nPress [STOP] to stop the program.')
+        pr = m_time + 1
         tt = time.time() - st
         tt = tt + s_time
-        pr = (pr * 100) // tt  
-        for i in range(0, s_time-1):
-            popup('Activity Percentage: ' + str(pr) + "% \nProgram will be running back within " + str(s_time - i) + " seconds...")
+        pr = (pr * 100) // tt
+        for i in range(0, s_time - 1):
+            popup('Activity Percentage: ' + str(pr) + "% \nProgram will be running back within " + str(
+                s_time - i) + " seconds...")
             time.sleep(1)
             if not running:
                 break
@@ -133,7 +170,6 @@ stop.pack(padx=30, pady=10)
 
 destroy = ttk.Button(app, text="Exit", command=on_destroy)
 destroy.pack(padx=50, pady=10)
-
 
 app.after(1000, auto_py)
 app.mainloop()
