@@ -4,6 +4,7 @@
 @author: github@imshakil
 """
 
+import os
 import sys
 import time
 import random
@@ -47,7 +48,8 @@ running = False
 
 # Config Parse
 config = configparser.ConfigParser()
-config.read('../config.ini')
+config.read(os.getcwd()+'/config.ini')
+
 
 mouse_movement = config.getboolean('MouseMovement', 'allow')
 page_scroll = config.getboolean('PageScroll', 'allow')
