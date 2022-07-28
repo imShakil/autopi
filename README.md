@@ -77,7 +77,7 @@ Put this desktop entry inside:
 
 # Usage
 
-By default it will just try click your mouse and will switch tabs if they are open. You may customize the [config.ini](config.ini) as your own.
+By default it will just try click your mouse and will switch tabs if they are open. You may customize the [config.ini](bin/config.ini) as your own.
 
 ```editorconfig
 [DEFAULT]

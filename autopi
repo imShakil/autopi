@@ -7,14 +7,44 @@
 import os
 import sys
 import time
+import glob
 import random
 import logging
+import platform
 import subprocess
 import configparser
 
-msg_fmt = "[%(asctime)s ] %(levelname)s @ line %(lineno)d: %(message)s"
-logging.basicConfig(filename='autopi.log', filemode='w', format=msg_fmt)
+ROOT_DIR = os.path.dirname(os.path.abspath('~'))  # Change this if not in home directory
+CONFIG_DIR = ROOT_DIR + "/bin"
+LOG_DIR = ROOT_DIR + '/logs'
 
+if not os.path.exists(LOG_DIR):
+    path = os.popen('mkdir -p ' + LOG_DIR).read()
+
+msg_fmt = "[%(asctime)s ] %(levelname)s @ line %(lineno)d: %(message)s"
+logging.basicConfig(filename=LOG_DIR + '/' + str(time.time()) + '_logfile.log',
+                    filemode='w', format=msg_fmt, level=logging.DEBUG)
+logging.warning("Is logs saved or not")
+logging.info(ROOT_DIR)
+logging.info(CONFIG_DIR)
+logging.info(LOG_DIR)
+
+# clean logs
+files = glob.glob(LOG_DIR + '/*.*_logfile.log')
+cnt = 0
+current_time = time.time()
+expire_time = 86400  # values are in seconds, default 24 hrs
+for f in files:
+    f_ctime = os.path.getctime(f)
+    if current_time - f_ctime >= expire_time:
+        os.remove(f)
+        cnt += 1
+if cnt > 0:
+    logging.info(str(cnt) + " logs cleaned successfully")
+
+if platform.system() != "Linux":
+    logging.error("This script runs only for Linux OS.")
+    sys.exit()
 
 if sys.version_info.major < 3:
     logging.info("This script runs under python3")
@@ -44,7 +74,7 @@ from tkinter import *
 from tkinter import ttk
 import pyautogui as pyg
 
-app = Tk()
+app = Tk(className='Python Stalker')
 app.geometry("400x300")
 app.minsize(400, 300)
 app.title('Python Stalker')
@@ -53,12 +83,10 @@ running = False
 
 # Config Parse
 config = configparser.ConfigParser()
-try:
-    config.read('../config.ini')
-except Exception as e:
-    logging.error(e)
-    sys.exit()
+config.read(CONFIG_DIR + '/config.ini')
 
+if len(config.sections()) <= 0:
+    logging.error("Configurations are corrupted or file is missing.")
 
 mouse_movement = config.getboolean('MouseMovement', 'allow')
 page_scroll = config.getboolean('PageScroll', 'allow')
@@ -72,6 +100,7 @@ def popup(msg):
     text_box.delete("1.0", "end")
     text_box.insert('end', msg)
     text_box.update()
+    # logging.info(msg) use this to store messages in logs instead
 
 
 def on_start():
