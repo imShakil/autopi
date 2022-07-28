@@ -8,11 +8,16 @@ import os
 import sys
 import time
 import random
+import logging
 import subprocess
 import configparser
 
+msg_fmt = "[%(asctime)s ] %(levelname)s @ line %(lineno)d: %(message)s"
+logging.basicConfig(filename='autopi.log', filemode='w', format=msg_fmt)
+
+
 if sys.version_info.major < 3:
-    print("This script runs under python3")
+    logging.info("This script runs under python3")
     sys.exit()
 
 missing_packages = ['scrot', 'python3-tk', 'python3-dev']
@@ -23,7 +28,7 @@ def packages():
         for package in missing_packages:
             subprocess.check_call(['apt-get', 'install', '-y', package])
     except IOError:
-        print(IOError)
+        logging.error(IOError)
         sys.exit()
 
 
@@ -48,7 +53,11 @@ running = False
 
 # Config Parse
 config = configparser.ConfigParser()
-config.read(os.getcwd()+'/config.ini')
+try:
+    config.read('../config.ini')
+except Exception as e:
+    logging.error(e)
+    sys.exit()
 
 
 mouse_movement = config.getboolean('MouseMovement', 'allow')
