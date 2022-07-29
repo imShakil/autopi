@@ -22,53 +22,64 @@ if not os.path.exists(LOG_DIR):
     path = os.popen('mkdir -p ' + LOG_DIR).read()
 
 msg_fmt = "[%(asctime)s ] %(levelname)s @ line %(lineno)d: %(message)s"
-logging.basicConfig(filename=LOG_DIR + '/' + str(time.time()) + '_logfile.log',
+tt = time.localtime(time.time())
+tmf = '{}-{}-{}_{}:{}:{}'.format(tt.tm_year, tt.tm_mon, tt.tm_mday, tt.tm_hour, tt.tm_min, tt.tm_sec)
+logging.basicConfig(filename=LOG_DIR + '/' + tmf + '_logfile.log',
                     filemode='w', format=msg_fmt, level=logging.DEBUG)
-logging.warning("Is logs saved or not")
-logging.info(ROOT_DIR)
-logging.info(CONFIG_DIR)
-logging.info(LOG_DIR)
 
-# clean logs
-files = glob.glob(LOG_DIR + '/*.*_logfile.log')
-cnt = 0
-current_time = time.time()
-expire_time = 86400  # values are in seconds, default 24 hrs
-for f in files:
-    f_ctime = os.path.getctime(f)
-    if current_time - f_ctime >= expire_time:
-        os.remove(f)
-        cnt += 1
-if cnt > 0:
-    logging.info(str(cnt) + " logs cleaned successfully")
+logging.info("Root Directory: " + ROOT_DIR + " has been detected.")
+logging.info("Config Directory: " + CONFIG_DIR + " has been detected.")
+logging.info("Logs will be saved in " + LOG_DIR)
 
-if platform.system() != "Linux":
-    logging.error("This script runs only for Linux OS.")
-    sys.exit()
+
+def clean_logs():
+    files = glob.glob(LOG_DIR + '/*_logfile.log')
+    cnt = 0
+    current_time = time.time()
+    expire_time = 86400  # values are in seconds, default 24 hrs
+    for f in files:
+        file_creation_time = os.path.getctime(f)
+        if current_time - file_creation_time >= expire_time:
+            os.remove(f)
+            cnt += 1
+    if cnt > 0:
+        logging.info(str(cnt) + " logs cleaned successfully")
+
 
 if sys.version_info.major < 3:
     logging.info("This script runs under python3")
     sys.exit()
 
-missing_packages = ['scrot', 'python3-tk', 'python3-dev']
 
-
-def packages():
+def packages(install_packages):
     try:
-        for package in missing_packages:
+        for package in install_packages:
             subprocess.check_call(['apt-get', 'install', '-y', package])
     except IOError:
         logging.error(IOError)
         sys.exit()
 
 
-try:
-    from tkinter import *
-    from tkinter import ttk
-    import pyautogui
-except ImportError as e:
-    packages()
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyautogui'])
+if platform.system() == "Linux":
+    missing_packages = ['scrot', 'python3-tk', 'python3-dev']
+    try:
+        from tkinter import *
+        from tkinter import ttk
+        import pyautogui
+    except ImportError as e:
+        packages(missing_packages)
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyautogui'])
+        logging.info(str(missing_packages) + " installed successfully.")
+
+
+if platform.system() == "Darwin":
+    try:
+        from tkinter import *
+        from tkinter import ttk
+        import pyautogui as pyg
+    except ImportError as e:
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyautogui'])
+        logging.info("pyautogui installed successfully")
 
 from tkinter import *
 from tkinter import ttk
@@ -77,7 +88,7 @@ import pyautogui as pyg
 app = Tk(className='Python Stalker')
 app.geometry("400x300")
 app.minsize(400, 300)
-app.title('Python Stalker')
+app.title('Python Stalsker')
 text_box = Text(app, height=30, width=300)
 running = False
 
@@ -87,6 +98,7 @@ config.read(CONFIG_DIR + '/config.ini')
 
 if len(config.sections()) <= 0:
     logging.error("Configurations are corrupted or file is missing.")
+    sys.exit()
 
 mouse_movement = config.getboolean('MouseMovement', 'allow')
 page_scroll = config.getboolean('PageScroll', 'allow')
