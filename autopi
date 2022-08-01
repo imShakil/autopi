@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/opt/homebrew/bin/python3
 
 """
 @author: github@imshakil
@@ -44,6 +44,9 @@ def clean_logs():
             cnt += 1
     if cnt > 0:
         logging.info(str(cnt) + " logs cleaned successfully")
+
+
+clean_logs()
 
 
 if sys.version_info.major < 3:
