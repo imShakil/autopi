@@ -89,7 +89,7 @@ import pyautogui as pyg
 app = Tk(className='Python Stalker')
 app.geometry("400x300")
 app.minsize(400, 300)
-app.title('Python Stalsker')
+app.title('Python Stalker')
 text_box = Text(app, height=30, width=300)
 running = False
 
