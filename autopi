@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/opt/homebrew/bin/python3
 
 """
 @author: github@imshakil
@@ -37,15 +37,17 @@ def clean_logs():
     try:
         files = glob.glob(LOG_DIR + '/*_logfile.log')
     except:
+        logging.error("logs cleaning error")
         return
     current_time = time.time()
     expire_time = 86400  # values are in seconds, default 24 hrs
     for f in files:
         file_creation_time = os.path.getctime(f)
-        if current_time - file_creation_time >= expire_time:
+        if int(current_time - file_creation_time) >= expire_time:
             os.remove(f)
 
 try:
+    logging.info("Running logs cleaner...")
     clean_logs()
     logging.info("logs cleaned successfully")
 except Exception as e:
@@ -205,8 +207,8 @@ def auto_py():
     try:
         active_time = min(config.getint('DEFAULT', 'ActiveTime'), 90)
     except ValueError:
-        logging.warn(ValueError)
-        logging.warn("Using defaul value for active time...")
+        logging.warning(ValueError)
+        logging.warning("Using defaul value for active time...")
         active_time = random.randint(10, 70)
     
     m_time = int(60 * active_time / 100) - 3
