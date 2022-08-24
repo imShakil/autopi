@@ -14,7 +14,8 @@ import platform
 import subprocess
 import configparser
 
-ROOT_DIR = os.path.dirname(os.path.abspath('~'))  # Change this if not in home directory
+# Change this if not in home directory
+ROOT_DIR = os.path.dirname(os.path.abspath('~')) #+ '/Users/imshakil/autopi'
 CONFIG_DIR = ROOT_DIR + "/bin"
 LOG_DIR = ROOT_DIR + '/logs'
 
@@ -33,21 +34,23 @@ logging.info("Logs will be saved in " + LOG_DIR)
 
 
 def clean_logs():
-    files = glob.glob(LOG_DIR + '/*_logfile.log')
-    cnt = 0
+    try:
+        files = glob.glob(LOG_DIR + '/*_logfile.log')
+    except:
+        return
     current_time = time.time()
     expire_time = 86400  # values are in seconds, default 24 hrs
     for f in files:
         file_creation_time = os.path.getctime(f)
         if current_time - file_creation_time >= expire_time:
             os.remove(f)
-            cnt += 1
-    if cnt > 0:
-        logging.info(str(cnt) + " logs cleaned successfully")
 
-
-clean_logs()
-
+try:
+    clean_logs()
+    logging.info("logs cleaned successfully")
+except Exception as e:
+    logging.error(e)
+    pass
 
 if sys.version_info.major < 3:
     logging.info("This script runs under python3")
@@ -88,6 +91,8 @@ from tkinter import *
 from tkinter import ttk
 import pyautogui as pyg
 
+
+logging.info("Imported package successfully")
 
 app = Tk(className='Python Stalker')
 app.geometry("400x300")
@@ -171,6 +176,7 @@ def move_mouse(mm_time):
     if not mouse_movement:
         return
     mxs, mys = pyg.size()
+    logging.info("Monitor size detected as: ({}, {})".format(mxs, mys))
     for i in range(0, mm_time):
         cpx, cpy = pyg.position()
         px = (cpx + random.randint(0, mxs)) % mxs
@@ -197,16 +203,14 @@ def click_mouse():
 
 def auto_py():
     try:
-        active_time = min(config.getint('DEFAULT', 'ActiveTime'), 50)
+        active_time = min(config.getint('DEFAULT', 'ActiveTime'), 90)
     except ValueError:
-        active_time = random.randint(30, 40)
-
-    try:
-        m_time = min(config.getint('MouseMovement', 'mmTime'), active_time - 10)
-    except ValueError:
-        m_time = random.randint(20, 30)
-
-    s_time = 60 - active_time
+        logging.warn(ValueError)
+        logging.warn("Using defaul value for active time...")
+        active_time = random.randint(10, 70)
+    
+    m_time = int(60 * active_time / 100) - 3
+    s_time = 60 - int(60 * active_time / 100)
 
     if running:
         switch_tab()
@@ -216,9 +220,8 @@ def auto_py():
         move_mouse(m_time)
         popup(
             'Looping...\nProgram will run again after ' + str(s_time) + ' seconds.\nPress [STOP] to stop the program.')
-        pr = (active_time * 100) // 60
         for i in range(0, s_time - 1):
-            popup('Activity Percentage: ' + str(pr) + "% \nProgram will be running back within " + str(
+            popup('Activity Percentage: ' + str(active_time) + "% \nProgram will be running back within " + str(
                 s_time - i) + " seconds...")
             time.sleep(1)
             if not running:
